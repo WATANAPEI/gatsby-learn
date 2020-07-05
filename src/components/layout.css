@@ -311,11 +311,11 @@ svg {
 	margin-top: 20px;
 	margin-bottom: 50px;
 	font-size: 14px;
-	color: #fff;
 }
 
 .footer {
 	position: relative;
+	color: #fff;
 }
 
 .footer .container {
