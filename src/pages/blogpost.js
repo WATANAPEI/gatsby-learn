@@ -8,6 +8,7 @@ import { faClock, faFolderOpen } from "@fortawesome/free-regular-svg-icons"
 import { faChevronLeft, faChevronRight, faCheckSquare, } from "@fortawesome/free-solid-svg-icons"
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types"
+import useContentfulImage from "../utils/useContentfulImage"
 
 const options = {
     renderNode: {
@@ -18,6 +19,16 @@ const options = {
             </h2>
         ),
     },
+    [BLOCKS.EMBEDDED_ASSET]: node => (
+        <Img
+            fluid={useContentfulImage(node.data.target.fields.file["ja-JP"].url)}
+            alt={
+                node.data.target.fields.description
+                    ? node.data.target.fields.description["ja-JP"]
+                    : node.data.target.fields.title["ja-JP"]
+            }
+        />
+    )
 }
 
 export default( {data} ) => (
