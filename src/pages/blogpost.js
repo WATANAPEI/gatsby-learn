@@ -28,7 +28,12 @@ const options = {
                     : node.data.target.fields.title["ja-JP"]
             }
         />
-    )
+    ),
+    renderText: text => {
+        return text.split("\n").reduce((children, textSegment, index) => {
+            return [...children, index > 0 && <br key={index} />, textSegment]
+        }, [])
+    },
 }
 
 export default( {data} ) => (
