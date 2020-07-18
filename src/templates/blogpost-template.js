@@ -1,7 +1,9 @@
 import React from "react"
 import Layout from "../components/layout"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 import Img from "gatsby-image"
+
+import SEO from "../components/seo"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faClock, faFolderOpen } from "@fortawesome/free-regular-svg-icons"
@@ -9,6 +11,7 @@ import { faChevronLeft, faChevronRight, faCheckSquare, } from "@fortawesome/free
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types"
 import useContentfulImage from "../utils/useContentfulImage"
+import {documentToPlainTextString } from "@contentful/rich-text-plain-text-renderer"
 
 const options = {
     renderNode: {
@@ -36,8 +39,18 @@ const options = {
     },
 }
 
-export default( {data} ) => (
+export default( {data, pageContext, location} ) => (
     <Layout>
+        <SEO
+            pageTitle={data.contentfulBlogPost.title}
+            pagedesc={`${documentToPlainTextString(
+                data.contentfulBlogPost.content.json
+            ).slice(0, 70)}...`}
+            pagepath={location.pathname}
+            blogimg={`https:${data.contentfulBlogPost.eyecatch.file.url}`}
+            pageimgw={data.contentfulBlogPost.eyecatch.file.details.image.width}
+            pageimgh={data.contentfulBlogPost.eyecatch.file.details.image.height}
+        />
         <div className="eyecatch">
             <figure>
                 <Img
@@ -71,18 +84,22 @@ export default( {data} ) => (
                 </p>
             </div>
             <ul className="postlink">
-                <li className="prev">
-                <a href="base-blogpost.html" rel="prev">
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                    <span>前の記事</span>
-                </a>
-                </li>
-                <li className="next">
-                <a href="base-blogpost.html" rel="next">
-                    <span>次の記事</span>
-                    <FontAwesomeIcon icon={faChevronRight} />
-                </a>
-                </li>
+                {pageContext.next && (
+                    <li className="prev">
+                        <Link to={`/blog/post/${pageContext.next.slug}/`} rel="prev">
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                            <span>{pageContext.next.title}</span>
+                        </Link>
+                    </li>
+                )}
+                {pageContext.previous && (
+                    <li className="next">
+                        <Link to={`/blog/post/${pageContext.previous.slug}/`} rel="next">
+                            <FontAwesomeIcon icon={faChevronRight} />
+                            <span>{pageContext.previous.title}</span>
+                        </Link>
+                    </li>
+                )}
             </ul>
             </div>
         </article>
@@ -105,6 +122,15 @@ export const query = graphql`
                     ...GatsbyContentfulFluid_withWebp
                 }
                 description
+                file {
+                    details {
+                    image {
+                        height
+                        width
+                    }
+                    }
+                    url
+                }
             }
             content {
                 json
