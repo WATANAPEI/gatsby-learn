@@ -21,6 +21,7 @@ export default () => {
             <ul>
               <li><Link to={`/`}>TOP</Link></li>
               <li><Link to={`/about/`}>ABOUT</Link></li>
+              <li><Link to={`/blog/`}>BLOG</Link></li>
             </ul>
           </nav>
         </div>
