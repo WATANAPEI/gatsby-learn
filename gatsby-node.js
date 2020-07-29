@@ -21,6 +21,18 @@ exports.createPages = async({ graphql, actions, reporter}) => {
                     }
                 }
             }
+            allContentfulCategory {
+                edges {
+                    node {
+                        categorySlug
+                        id
+                        category
+                        blogpost {
+                            title
+                        }
+                    }
+                }
+            }
         }
     `)
 
@@ -57,6 +69,48 @@ exports.createPages = async({ graphql, actions, reporter}) => {
                 isLast: i + 1 === blogPages,
 
             }
+        })
+    })
+
+    blogresult.data.allContentfulCategory.edges.forEach(({ node }) => {
+        createPage({
+            path: `/cat/${node.categorySlug}/`,
+            component: path.resolve(`./src/templates/cat-template.js`),
+            context: {
+                catid: node.id,
+                catname: node.category,
+                skip: 0,
+                limit: 100,
+                currentPage: 1,
+                isFirst: true,
+                isLast: true,
+            },
+        })
+    })
+
+    blogresult.data.allContentfulCategory.edges.forEach(( { node }) => {
+        const catPostsPerPage = 2
+        const catPosts = node.blogpost.length
+        const catPages = Math.ceil(catPosts / catPostsPerPage)
+
+        Array.from( { length: catPages }).forEach((_, i) => {
+            createPage({
+                path: i === 0
+                    ? `/cat/${node.categorySlug}/`
+                    : `/cat/${node.categorySlug}/${ i + 1}/`,
+                component: path.resolve("./src/templates/cat-template.js"),
+                context: {
+                    catid: node.id,
+                    catname: node.category,
+                    catslug: node.categorySlug,
+                    skip: catPostsPerPage * i,
+                    limit: catPostsPerPage,
+                    currentPage: i + 1,
+                    isFirst: i + 1 === 1,
+                    isLast: i + 1 === catPages,
+
+                },
+            })
         })
     })
 }
